@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Face Profiler</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050510;
+            --primary: #00f0ff;
+            --secondary: #ff003c;
+            --glass: rgba(16, 18, 27, 0.4);
+            --glass-border: rgba(0, 240, 255, 0.2);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: radial-gradient(circle at center, #1a1b3a 0%, var(--bg-color) 100%);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 2rem auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1.glitch {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+            margin: 0;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            color: #8c90b0;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            border-radius: 15px;
+            padding: 3rem;
+        }
+
+        .file-drop-area {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 150px;
+            border: 2px dashed var(--primary);
+            border-radius: 10px;
+            transition: 0.3s;
+            background: rgba(0, 240, 255, 0.05);
+            margin-bottom: 2rem;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .file-drop-area:hover {
+            background: rgba(0, 240, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+        }
+
+        .fake-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--primary);
+            padding: 8px 15px;
+            border-radius: 3px;
+            text-transform: uppercase;
+            font-weight: bold;
+            pointer-events: none;
+        }
+
+        .file-msg {
+            color: #00f0ff;
+            font-size: 1rem;
+            pointer-events: none;
+            word-break: break-all;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .file-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            cursor: pointer;
+            opacity: 0;
+        }
+
+        .cyber-btn {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .cyber-btn:hover {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        .expert-system-panel {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: rgba(0, 240, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+        }
+
+        .panel-title {
+            color: var(--secondary);
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 2rem;
+            letter-spacing: 2px;
+            font-size: 1.2rem;
+        }
+
+        .component-list {
+            display: flex;
+            justify-content: space-between;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .component-item {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1rem;
+            border-left: 3px solid var(--primary);
+            border-radius: 5px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .component-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 240, 255, 0.2);
+        }
+
+        .component-item .icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+        }
+
+        .component-item .details h4 {
+            margin: 0 0 5px 0;
+            color: var(--primary);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+        }
+
+        .component-item .details p {
+            margin: 0;
+            color: #8c90b0;
+            font-size: 0.9rem;
+        }
+
+        .results-container {
+            display: flex;
+            gap: 3rem;
+            margin-top: 3rem;
+            padding-top: 3rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .image-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+            border: 2px solid var(--primary);
+            border-radius: 5px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+
+        .image-box img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+            animation: scan 3s linear infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes scan {
+            0% {
+                top: 0;
+            }
+
+            50% {
+                top: 100%;
+            }
+
+            100% {
+                top: 0;
+            }
+        }
+
+        .data-box {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .data-box h3 {
+            color: var(--secondary);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 0;
+            text-shadow: 0 0 5px var(--secondary);
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--primary);
+            color: #000;
+            padding: 5px 15px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            font-size: 1.5rem;
+            border-radius: 3px;
+            margin: 10px 0;
+        }
+
+        .desc {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        .stat-bar {
+            margin-top: 1.5rem;
+        }
+
+        .stat-bar span {
+            display: block;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            color: #8c90b0;
+        }
+
+        .progress {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .fill {
+            height: 100%;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+            transition: width 1s ease-in-out;
+        }
+
+        .error-box {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(255, 0, 60, 0.1);
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+            text-align: center;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1 class="glitch" data-text="AI FACE PROFILER">AI FACE PROFILER</h1>
+            <p class="subtitle">Neural Face & Personality Analysis System</p>
+        </header>
+
+        <main class="glass-panel">
+            <form action="/" method="POST" enctype="multipart/form-data" class="upload-form">
+                <div class="file-drop-area">
+                    <span class="fake-btn">Choose Image</span>
+                    <span class="file-msg">or drag and drop here</span>
+                    <input class="file-input" type="file" name="file" accept="image/*" required>
+                </div>
+                <button type="submit" class="cyber-btn">ANALYZE PROFILE</button>
+            </form>
+
+            <div class="expert-system-panel">
+                <h3 class="panel-title">⚙️ EXPERT SYSTEM ARCHITECTURE</h3>
+                <div class="component-list">
+                    <div class="component-item">
+                        <div class="icon">🧠</div>
+                        <div class="details">
+                            <h4>Knowledge Base</h4>
+                            <p>(Facts & Rules)</p>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <div class="icon">⚡</div>
+                        <div class="details">
+                            <h4>Inference Engine</h4>
+                            <p>(Logic-based reasoning)</p>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <div class="icon">🖥️</div>
+                        <div class="details">
+                            <h4>User Interface</h4>
+                            <p>(Queries and Outputs)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if error %}
+            <div class="error-box">
+                <p>⚠️ {{ error }}</p>
+            </div>
+            {% endif %}
+
+            {% if ptype %}
+            <div class="results-container">
+                <div class="image-box">
+                    <<img src="/static/uploads/{{ image_url }}" alt="Analyzed Face">>
+                        <div class="scan-line"></div>
+                </div>
+                <div class="data-box">
+                    <h3>PROFILE MATCH DETECTED</h3>
+                    <div class="personality-type">
+                        <span class="badge">{{ ptype }}</span>
+                    </div>
+                    <p class="desc">{{ desc }}</p>
+
+                    <div class="stats">
+                        <div class="stat-bar">
+                            <span>Confidence - {{ confidence }}%</span>
+                            <div class="progress">
+                                <div class="fill" style="width: {{ confidence }}%;"></div>
+                            </div>
+                        </div>
+                        <div class="stat-bar">
+                            <span>Facial Symmetry - {{ symmetry }}%</span>
+                            <div class="progress">
+                                <div class="fill" style="width: {{ symmetry }}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+
+    <footer
+        style="position: fixed; bottom: 10px; left: 0; width: 100%; text-align: center; color: #00f0ff; opacity: 0.7; font-family: 'Orbitron', sans-serif; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; z-index: 100;">
+        <p style="margin: 0;">Developed by Ibad U Rehman</p>
+    </footer>
+
+    <script>
+        const fileInput = document.querySelector('.file-input');
+        const fileMsg = document.querySelector('.file-msg');
+
+        fileInput.addEventListener('change', function (e) {
+            if (e.target.files.length > 0) {
+                fileMsg.textContent = "Selected: " + e.target.files[0].name;
+            } else {
+                fileMsg.textContent = "or drag and drop here";
+            }
+        });
+    </script>
+</body>
+
+</html>
