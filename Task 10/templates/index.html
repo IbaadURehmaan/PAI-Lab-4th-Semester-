@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Superior Gold Campus Bot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #eef2f3;
+            margin-top: 50px;
+        }
+
+        .chat-box {
+            width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            color: #003366;
+            margin-bottom: 20px;
+        }
+
+        .history {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            background: #fafafa;
+        }
+
+        .user-text {
+            color: #0055cc;
+            text-align: right;
+            margin: 8px 0;
+        }
+
+        .bot-text {
+            color: #2e8b57;
+            text-align: left;
+            margin: 8px 0;
+        }
+
+        .input-area {
+            display: flex;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background: #003366;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="chat-box">
+        <div class="header">
+            <h2>Admission Bot</h2>
+            <p>Superior University - Gold Campus</p>
+        </div>
+
+        <div class="history" id="chat-history">
+            <div class="bot-text"><strong>Bot:</strong> Hello! Ask me about admissions.</div>
+        </div>
+
+        <form id="msg-form" class="input-area">
+            <input type="text" id="user_msg" placeholder="Type here..." required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        let form = document.getElementById('msg-form');
+        let historyBox = document.getElementById('chat-history');
+        let inputField = document.getElementById('user_msg');
+
+        form.onsubmit = async function (event) {
+            event.preventDefault(); // Prevents the page from refreshing
+
+            let text = inputField.value;
+
+            // Show user message on screen
+            historyBox.innerHTML += '<div class="user-text"><strong>You:</strong> ' + text + '</div>';
+
+            // Prepare data to send to Flask
+            let data = new FormData();
+            data.append('message', text);
+
+            // Send data to the /ask route in app.py
+            let response = await fetch('/ask', {
+                method: 'POST',
+                body: data
+            });
+
+            // Get the bot's reply and show it on screen
+            let result = await response.json();
+            historyBox.innerHTML += '<div class="bot-text"><strong>Bot:</strong> ' + result.response + '</div>';
+
+            // Clear input box and scroll to bottom
+            inputField.value = '';
+            historyBox.scrollTop = historyBox.scrollHeight;
+        };
+    </script>
+
+</body>
+
+</html>
